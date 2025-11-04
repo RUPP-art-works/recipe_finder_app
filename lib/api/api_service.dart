@@ -87,4 +87,18 @@ class ApiService {
       throw Exception('Failed to load meals for category $categoryName');
     }
   }
+
+  Future<Meal> getMealDetail(String id) async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/meals/$id'),
+      headers: _headers,
+    );
+
+    if (response.statusCode == 200) {
+      Map<String, dynamic> body = jsonDecode(response.body);
+      return Meal.fromJson(body);
+    } else {
+      throw Exception('Failed to load meal detail for ID: $id');
+    }
+  }
 }
