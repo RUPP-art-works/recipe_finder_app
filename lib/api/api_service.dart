@@ -1,5 +1,3 @@
-// lib/api/api_service.dart
-
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
@@ -33,8 +31,6 @@ class ApiService {
       throw Exception('Failed to load meals');
     }
   }
-
-
 
   Future<List<Meal>> getMultipleRandomMeals(int count) async {
     final response = await http.get(
@@ -125,3 +121,4 @@ class ApiService {
     }
   }
 }
+

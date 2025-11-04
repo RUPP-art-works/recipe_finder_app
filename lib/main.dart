@@ -7,6 +7,7 @@ import 'screens/main_screen.dart';
 import 'providers/category_provider.dart';
 
 void main() {
+
   runApp(
     // Wrap the entire app in a MultiProvider
     MultiProvider(

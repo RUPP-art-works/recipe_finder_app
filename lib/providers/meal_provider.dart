@@ -42,7 +42,7 @@ class MealProvider with ChangeNotifier {
         final meal = await _apiService.getMealDetail(id);
         _favoriteMeals.add(meal);
       } catch (e) {
-        print('Error fetching favorite meal $id: $e');
+        // Handle error
       }
     }
     notifyListeners();
@@ -69,7 +69,6 @@ class MealProvider with ChangeNotifier {
       final meals = await _apiService.getMultipleRandomMeals(count);
       return meals;
     } catch (e) {
-      print('Error fetching multiple random meals: $e');
       return [];
     }
   }
@@ -82,7 +81,6 @@ class MealProvider with ChangeNotifier {
       return meal;
     } catch (e) {
       // Handle error
-      print('Error fetching random meal: $e');
       return null;
     }
   }
@@ -95,24 +93,26 @@ class MealProvider with ChangeNotifier {
       _meals = await _apiService.getMeals();
     } catch (e) {
       // Handle error, for example, by setting an error message
-      print('Error fetching meals: $e');
     }
 
     _isLoading = false;
     notifyListeners(); // Notify widgets that loading is complete and data is ready
   }
 
-  Future<void> fetchMealsByCategory(String categoryName) async {
+  Future<List<Meal>> fetchMealsByCategory(String categoryName) async {
     _isLoading = true;
     notifyListeners();
 
     try {
-      _meals = await _apiService.getMealsByCategory(categoryName);
+      final meals = await _apiService.getMealsByCategory(categoryName);
+      _meals = meals;
+      return meals;
     } catch (e) {
-      print('Error fetching meals by category: $e');
+      return [];
     }
-
-    _isLoading = false;
-    notifyListeners();
+    finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 }

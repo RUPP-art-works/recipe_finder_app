@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/meal.dart';
 import '../providers/meal_provider.dart';
+import '../providers/category_provider.dart';
 import '../widgets/meal_list_item.dart';
 import '../widgets/popular_meal_banner.dart';
 import 'meal_detail_screen.dart';
+import 'category_meals_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,6 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<MealProvider>(context, listen: false).fetchMeals();
+      Provider.of<CategoryProvider>(context, listen: false).fetchCategories();
     });
   }
 
@@ -86,6 +89,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: PopularMealBanner(),
                             ),
                             const SizedBox(height: 20),
+                            _buildCategorySection(context),
+                            const SizedBox(height: 20),
                             const Padding(
                               padding: EdgeInsets.symmetric(horizontal: 16),
                               child: Text(
@@ -146,4 +151,60 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  Widget _buildCategorySection(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Text(
+            'Categories',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Consumer<CategoryProvider>(
+          builder: (context, categoryProvider, _) {
+            if (categoryProvider.isLoading) {
+              return const Center(child: LinearProgressIndicator());
+            }
+            return SizedBox(
+              height: 50,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                itemCount: categoryProvider.categories.length,
+                itemBuilder: (context, index) {
+                  final category = categoryProvider.categories[index];
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: FilterChip(
+                      avatar: CircleAvatar(
+                        backgroundImage: NetworkImage(category.thumbnailUrl),
+                      ),
+                      label: Text(category.name),
+                      onSelected: (isSelected) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                CategoryMealsScreen(categoryName: category.name),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
 }
