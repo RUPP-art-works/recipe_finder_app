@@ -1,5 +1,3 @@
-// lib/screens/home_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/meal.dart';
@@ -52,26 +50,43 @@ class _HomeScreenState extends State<HomeScreen> {
             const PopularMealBanner(),
           Expanded(
             child: _randomMealFuture == null
-                ? Consumer<MealProvider>(
-                    builder: (context, mealProvider, child) {
-                      if (mealProvider.isLoading) {
-                        return const Center(
-                            child: CircularProgressIndicator());
-                      }
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Padding(
+                        padding: EdgeInsets.all(16.0),
+                        child: Text(
+                          'Random Food Suggestion',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Consumer<MealProvider>(
+                          builder: (context, mealProvider, child) {
+                            if (mealProvider.isLoading) {
+                              return const Center(
+                                  child: CircularProgressIndicator());
+                            }
 
-                      if (mealProvider.meals.isEmpty) {
-                        return const Center(
-                            child: Text('No meals found.'));
-                      }
+                            if (mealProvider.meals.isEmpty) {
+                              return const Center(
+                                  child: Text('No meals found.'));
+                            }
 
-                      return ListView.builder(
-                        itemCount: mealProvider.meals.length,
-                        itemBuilder: (context, index) {
-                          final meal = mealProvider.meals[index];
-                          return MealListItem(meal: meal);
-                        },
-                      );
-                    },
+                            return ListView.builder(
+                              itemCount: mealProvider.meals.length,
+                              itemBuilder: (context, index) {
+                                final meal = mealProvider.meals[index];
+                                return MealListItem(meal: meal);
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   )
                 : FutureBuilder<Meal?>(
                     future: _randomMealFuture,

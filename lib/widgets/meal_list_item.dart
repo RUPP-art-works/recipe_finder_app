@@ -33,13 +33,13 @@ class MealListItem extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
               child: Image.network(
                 meal.imageUrl,
-                height: 220,
+                height: 180,
                 width: double.infinity,
                 fit: BoxFit.cover,
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return const SizedBox(
-                    height: 220,
+                    height: 180,
                     child: Center(
                       child: CircularProgressIndicator(),
                     ),
@@ -47,7 +47,7 @@ class MealListItem extends StatelessWidget {
                 },
                 errorBuilder: (context, error, stackTrace) {
                   return const SizedBox(
-                    height: 220,
+                    height: 180,
                     child: Icon(Icons.broken_image, size: 50),
                   );
                 },
