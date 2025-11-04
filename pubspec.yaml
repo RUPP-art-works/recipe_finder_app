@@ -1,0 +1,31 @@
+name: recipe_finder_app
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  # This Dart SDK constraint is updated to be compatible with the latest packages.
+  sdk: '>=3.2.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  # Icons
+  cupertino_icons: ^1.0.6
+
+  # For making HTTP requests to the API
+  http: ^1.1.0
+
+  # For state management
+  provider: ^6.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  
+  flutter_lints: ^2.0.0
+
+
+flutter:
+  uses-material-design: true
