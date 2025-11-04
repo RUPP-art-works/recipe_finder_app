@@ -1,5 +1,3 @@
-// lib/widgets/meal_list_item.dart
-
 import 'package:flutter/material.dart';
 import '../models/meal.dart';
 import '../screens/meal_detail_screen.dart'; // Import the detail screen
@@ -14,82 +12,114 @@ class MealListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // InkWell makes the widget tappable and provides a visual ripple effect.
-    return InkWell(
+    return GestureDetector(
       onTap: () {
-        // This is the navigation logic.
-        // It pushes a new screen (MealDetailScreen) onto the navigation stack.
         Navigator.push(
           context,
           MaterialPageRoute(
-            // We pass the specific 'meal' for this list item to the detail screen.
             builder: (context) => MealDetailScreen(meal: meal),
           ),
         );
       },
-      // The child of the InkWell is the visual representation of the list item.
       child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        elevation: 4,
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        elevation: 6,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
+          borderRadius: BorderRadius.circular(20),
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+        child: Stack(
           children: [
-            // Image with rounded corners at the top
             ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(15),
-                topRight: Radius.circular(15),
-              ),
+              borderRadius: BorderRadius.circular(20),
               child: Image.network(
                 meal.imageUrl,
-                height: 200,
+                height: 220,
+                width: double.infinity,
                 fit: BoxFit.cover,
-                // Show a loading indicator while the image is loading
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
                   return const SizedBox(
-                    height: 200,
+                    height: 220,
                     child: Center(
                       child: CircularProgressIndicator(),
                     ),
                   );
                 },
-                // Show an icon if the image fails to load
                 errorBuilder: (context, error, stackTrace) {
                   return const SizedBox(
-                    height: 200,
+                    height: 220,
                     child: Icon(Icons.broken_image, size: 50),
                   );
                 },
               ),
             ),
-            // Meal details below the image
-            Padding(
-              padding: const EdgeInsets.all(12.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    meal.name,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Category: ${meal.category}',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey[600],
-                    ),
+                  gradient: LinearGradient(
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                    colors: [
+                      Colors.black.withOpacity(0.8),
+                      Colors.transparent,
+                    ],
                   ),
-                ],
+                ),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      meal.name,
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Category: ${meal.category}',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.white70,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  MealDetailScreen(meal: meal),
+                            ),
+                          );
+                        },
+                        icon: const Icon(Icons.arrow_forward_ios, size: 16),
+                        label: const Text('View Recipe'),
+                        style: ElevatedButton.styleFrom(
+                          foregroundColor: Colors.black,
+                          backgroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ],

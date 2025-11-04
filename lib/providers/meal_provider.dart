@@ -64,6 +64,16 @@ class MealProvider with ChangeNotifier {
     return _favoriteMealIds.contains(meal.id);
   }
 
+  Future<List<Meal>> fetchMultipleRandomMeals(int count) async {
+    try {
+      final meals = await _apiService.getMultipleRandomMeals(count);
+      return meals;
+    } catch (e) {
+      print('Error fetching multiple random meals: $e');
+      return [];
+    }
+  }
+
   Future<Meal?> fetchRandomMeal() async {
     try {
       final meal = await _apiService.getRandomMeal();

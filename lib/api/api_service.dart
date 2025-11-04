@@ -1,6 +1,7 @@
 // lib/api/api_service.dart
 
 import 'dart:convert';
+import 'dart:math';
 import 'package:http/http.dart' as http;
 import '../models/meal.dart';
 import '../models/category.dart';
@@ -33,17 +34,39 @@ class ApiService {
     }
   }
 
-  Future<Meal> getRandomMeal() async {
+
+
+  Future<List<Meal>> getMultipleRandomMeals(int count) async {
     final response = await http.get(
-      Uri.parse('$_baseUrl/random-meal'),
+      Uri.parse('$_baseUrl/meals'),
       headers: _headers,
     );
 
     if (response.statusCode == 200) {
-      Map<String, dynamic> body = jsonDecode(response.body);
-      return Meal.fromJson(body);
+      List<dynamic> body = jsonDecode(response.body);
+      List<Meal> meals =
+          body.map((dynamic item) => Meal.fromJson(item)).toList();
+      meals.shuffle();
+      return meals.take(count).toList();
     } else {
-      throw Exception('Failed to load random meal');
+      throw Exception('Failed to load meals');
+    }
+  }
+
+  Future<Meal> getRandomMeal() async {
+    final response = await http.get(
+      Uri.parse('$_baseUrl/meals'),
+      headers: _headers,
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(response.body);
+      List<Meal> meals =
+          body.map((dynamic item) => Meal.fromJson(item)).toList();
+      final random = Random();
+      return meals[random.nextInt(meals.length)];
+    } else {
+      throw Exception('Failed to load meals');
     }
   }
 
