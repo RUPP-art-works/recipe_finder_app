@@ -15,12 +15,10 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   Future<Meal?>? _randomMealFuture;
-  // This helps ensure we only fetch data once when the screen is first built.
+
   @override
   void initState() {
     super.initState();
-    // Use addPostFrameCallback to safely call the provider after the build is complete.
-    // listen: false is important because we are in initState.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<MealProvider>(context, listen: false).fetchMeals();
     });
@@ -29,87 +27,122 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text('Recipe Finder'),
+        title: const Text(
+          '🍽️ Recipe Finder',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+            letterSpacing: 1,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         actions: [
           IconButton(
-            icon: const Icon(Icons.shuffle),
+            tooltip: 'Shuffle a random meal',
+            icon: const Icon(Icons.shuffle_rounded, size: 26),
             onPressed: () {
               setState(() {
-                _randomMealFuture = Provider.of<MealProvider>(context, listen: false).fetchRandomMeal();
+                _randomMealFuture = Provider.of<MealProvider>(
+                  context,
+                  listen: false,
+                ).fetchRandomMeal();
               });
             },
           ),
         ],
       ),
-      // Use a Consumer widget to listen for changes in the MealProvider
-      body: Column(
-        children: [
-          if (_randomMealFuture ==
-              null) // Only show popular banner initially
-            const PopularMealBanner(),
-          Expanded(
-            child: _randomMealFuture == null
-                ? Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Padding(
-                        padding: EdgeInsets.all(16.0),
-                        child: Text(
-                          'Random Food Suggestion',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: Consumer<MealProvider>(
-                          builder: (context, mealProvider, child) {
-                            if (mealProvider.isLoading) {
-                              return const Center(
-                                  child: CircularProgressIndicator());
-                            }
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xFFF9F9F9), Color(0xFFF0F4F8)],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+        ),
+        child: SafeArea(
+          child: _randomMealFuture == null
+              ? Consumer<MealProvider>(
+                  builder: (context, mealProvider, _) {
+                    if (mealProvider.isLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
 
-                            if (mealProvider.meals.isEmpty) {
-                              return const Center(
-                                  child: Text('No meals found.'));
-                            }
+                    if (mealProvider.meals.isEmpty) {
+                      return const Center(child: Text('No meals found 😢'));
+                    }
 
-                            return ListView.builder(
+                    return SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: PopularMealBanner(),
+                            ),
+                            const SizedBox(height: 20),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                '✨ Random Food Suggestions',
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            // Wrap the grid in a container with shrinkWrap
+                            GridView.builder(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 12),
+                              shrinkWrap: true,
+                              physics:
+                                  const NeverScrollableScrollPhysics(), // important
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: 12,
+                                mainAxisSpacing: 12,
+                                childAspectRatio: 0.85,
+                              ),
                               itemCount: mealProvider.meals.length,
                               itemBuilder: (context, index) {
                                 final meal = mealProvider.meals[index];
                                 return MealListItem(meal: meal);
                               },
-                            );
-                          },
+                            ),
+                            const SizedBox(height: 30),
+                          ],
                         ),
                       ),
-                    ],
-                  )
-                : FutureBuilder<Meal?>(
-                    future: _randomMealFuture,
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState ==
-                          ConnectionState.waiting) {
-                        return const Center(
-                            child: CircularProgressIndicator());
-                      }
+                    );
+                  },
+                )
+              : FutureBuilder<Meal?>(
+                  future: _randomMealFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError ||
+                        !snapshot.hasData ||
+                        snapshot.data == null) {
+                      return const Center(
+                        child: Text('Failed to load random meal.'),
+                      );
+                    }
 
-                      if (snapshot.hasError ||
-                          !snapshot.hasData ||
-                          snapshot.data == null) {
-                        return const Center(
-                            child: Text('Failed to load random meal.'));
-                      }
-
-                      final meal = snapshot.data!;
-                      return MealDetailScreen(meal: meal);
-                    },
-                  ),
-          ),
-        ],
+                    final meal = snapshot.data!;
+                    return MealDetailScreen(meal: meal);
+                  },
+                ),
+        ),
       ),
     );
   }
