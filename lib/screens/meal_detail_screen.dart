@@ -36,7 +36,7 @@ class MealDetailScreen extends StatelessWidget {
                 onPressed: () => mealProvider.toggleFavorite(meal),
               ),
             ],
-            backgroundColor: Colors.deepOrangeAccent,
+            backgroundColor: Colors.blueAccent,
             elevation: 6,
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.vertical(bottom: Radius.circular(20)),
@@ -127,7 +127,7 @@ class MealDetailScreen extends StatelessWidget {
                     elevation: 4,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
-                    shadowColor: Colors.deepOrangeAccent.withOpacity(0.3),
+                    shadowColor: Colors.blueAccent.withOpacity(0.3),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
@@ -138,7 +138,7 @@ class MealDetailScreen extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
-                              color: Colors.deepOrange,
+                              color: Colors.blue,
                             ),
                           ),
                           const SizedBox(height: 12),
@@ -148,7 +148,7 @@ class MealDetailScreen extends StatelessWidget {
                             children:
                                 List.generate(meal.ingredients.length, (index) {
                               return Chip(
-                                backgroundColor: Colors.orange.shade50,
+                                backgroundColor: Colors.blue.shade50,
                                 avatar: const Icon(Icons.check_circle,
                                     size: 18, color: Colors.deepOrange),
                                 label: Text(
@@ -173,7 +173,7 @@ class MealDetailScreen extends StatelessWidget {
                     elevation: 4,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
-                    shadowColor: Colors.deepOrangeAccent.withOpacity(0.3),
+                    shadowColor: Colors.blueAccent.withOpacity(0.3),
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
@@ -184,7 +184,7 @@ class MealDetailScreen extends StatelessWidget {
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
-                              color: Colors.deepOrange,
+                              color: Colors.blue,
                             ),
                           ),
                           const SizedBox(height: 12),

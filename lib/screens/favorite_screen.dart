@@ -33,7 +33,7 @@ class FavoriteScreen extends StatelessWidget {
                     Icon(
                       Icons.favorite_border,
                       size: 80,
-                      color: Colors.deepOrange.shade200,
+                      color: Colors.blue.shade200,
                     ),
                     const SizedBox(height: 20),
                     const Text(

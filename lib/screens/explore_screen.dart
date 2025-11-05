@@ -68,7 +68,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
       appBar: AppBar(
         title: const Text('Explore Recipes'),
         centerTitle: true,
-        backgroundColor: Colors.deepOrangeAccent,
+        backgroundColor: Colors.blueAccent,
       ),
       body: Column(
         children: [

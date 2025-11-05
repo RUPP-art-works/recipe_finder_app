@@ -29,7 +29,7 @@ class RecipeFinderApp extends StatelessWidget {
     return MaterialApp(
       title: 'Recipe Finder',
       theme: ThemeData(
-        primarySwatch: Colors.deepPurple, // Changed theme for a new look
+        primarySwatch: Colors.blue, // Changed theme for a new look
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       // Set the home property to our new MainScreen
