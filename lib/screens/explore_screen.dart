@@ -15,21 +15,34 @@ class ExploreScreen extends StatefulWidget {
 class _ExploreScreenState extends State<ExploreScreen> {
   final ApiService _apiService = ApiService();
   List<Meal> _filteredMeals = [];
+  List<Meal> _randomMeals = [];
   bool _isMealsLoading = false;
 
   @override
   void initState() {
     super.initState();
-    // Fetch categories when the screen loads
+    // Fetch categories and random meals when the screen loads
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<CategoryProvider>(context, listen: false).fetchCategories();
+      _fetchRandomMeals();
     });
   }
 
-  // ✅ Fetch meals based on categoryId
-  Future<void> _fetchMealsForCategoryId(String? categoryId) async {
-    debugPrint('Fetching meals for categoryId: $categoryId');
+  Future<void> _fetchRandomMeals() async {
+    setState(() => _isMealsLoading = true);
+    try {
+      final meals = await _apiService.getMultipleRandomMeals(6);
+      setState(() => _randomMeals = meals);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to load random meals.')),
+      );
+    } finally {
+      setState(() => _isMealsLoading = false);
+    }
+  }
 
+  Future<void> _fetchMealsForCategoryId(String? categoryId) async {
     if (categoryId == null || categoryId.isEmpty) {
       setState(() => _filteredMeals = []);
       return;
@@ -39,13 +52,8 @@ class _ExploreScreenState extends State<ExploreScreen> {
 
     try {
       final meals = await _apiService.getMealsByCategoryId(categoryId);
-      setState(() {
-        _filteredMeals = meals;
-        debugPrint(
-            'Found ${_filteredMeals.length} meals for category $categoryId.');
-      });
+      setState(() => _filteredMeals = meals);
     } catch (e) {
-      debugPrint('Error fetching meals: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Failed to load meals.')),
       );
@@ -58,22 +66,18 @@ class _ExploreScreenState extends State<ExploreScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Explore by Category'),
+        title: const Text('Explore Recipes'),
         centerTitle: true,
+        backgroundColor: Colors.deepOrangeAccent,
       ),
       body: Column(
         children: [
-          // 🔹 Category Filter Chips
+          // 1. Category Filter Chips
           Consumer<CategoryProvider>(
-            builder: (context, categoryProvider, _) {
+            builder: (context, categoryProvider, child) {
               if (categoryProvider.isLoading) {
-                return const Center(child: LinearProgressIndicator());
+                return const LinearProgressIndicator();
               }
-
-              if (categoryProvider.categories.isEmpty) {
-                return const Center(child: Text('No categories found.'));
-              }
-
               return SizedBox(
                 height: 60,
                 child: ListView.builder(
@@ -92,12 +96,7 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         selected:
                             categoryProvider.selectedCategory == category.name,
                         onSelected: (isSelected) {
-                          // ✅ Update selected category
                           categoryProvider.selectCategory(category.name);
-                          debugPrint(
-                              'Selected: ${category.name} (id: ${category.id})');
-
-                          // ✅ Fetch by categoryId (the real filter key)
                           _fetchMealsForCategoryId(category.id);
                         },
                       ),
@@ -107,23 +106,49 @@ class _ExploreScreenState extends State<ExploreScreen> {
               );
             },
           ),
-
           const Divider(),
 
-          // 🔹 Filtered Meal List
+          // 2. Meals Grid
           Expanded(
             child: _isMealsLoading
                 ? const Center(child: CircularProgressIndicator())
-                : _filteredMeals.isEmpty
-                    ? const Center(
-                        child: Text('Select a category to see meals.'))
-                    : ListView.builder(
-                        itemCount: _filteredMeals.length,
-                        itemBuilder: (context, index) {
-                          final meal = _filteredMeals[index];
-                          return MealListItem(meal: meal);
-                        },
-                      ),
+                : Builder(
+                    builder: (context) {
+                      final categoryProvider =
+                          Provider.of<CategoryProvider>(context, listen: false);
+                      final mealsToShow =
+                          categoryProvider.selectedCategory == null
+                              ? _randomMeals
+                              : _filteredMeals;
+
+                      if (mealsToShow.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            'No meals to display.',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        );
+                      }
+
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 12),
+                        child: GridView.builder(
+                          itemCount: mealsToShow.length,
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
+                            childAspectRatio: 0.85,
+                          ),
+                          itemBuilder: (context, index) {
+                            return MealListItem(meal: mealsToShow[index]);
+                          },
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),

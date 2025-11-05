@@ -10,27 +10,67 @@ class FavoriteScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        title: const Text('Favorites'),
+        title: const Text(
+          'Favorites',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+        ),
+        backgroundColor: const Color.fromARGB(255, 134, 211, 247),
+        centerTitle: true,
       ),
       body: Consumer<MealProvider>(
         builder: (context, mealProvider, child) {
           final favoriteMeals = mealProvider.favoriteMeals;
 
           if (favoriteMeals.isEmpty) {
-            return const Center(
-              child: Text(
-                'No favorite meals yet. Start adding some!',
-                style: TextStyle(fontSize: 18, color: Colors.grey),
-                textAlign: TextAlign.center,
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.favorite_border,
+                      size: 80,
+                      color: Colors.deepOrange.shade200,
+                    ),
+                    const SizedBox(height: 20),
+                    const Text(
+                      'No favorite meals yet.',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 10),
+                    const Text(
+                      'Start adding some delicious meals to your favorites!',
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
             );
           } else {
-            return ListView.builder(
-              itemCount: favoriteMeals.length,
-              itemBuilder: (context, index) {
-                return MealListItem(meal: favoriteMeals[index]);
-              },
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              child: GridView.builder(
+                itemCount: favoriteMeals.length,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, // 2 columns
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  childAspectRatio: 0.85, // same as HomeScreen / Explore
+                ),
+                itemBuilder: (context, index) {
+                  final meal = favoriteMeals[index];
+                  return MealListItem(meal: meal);
+                },
+              ),
             );
           }
         },

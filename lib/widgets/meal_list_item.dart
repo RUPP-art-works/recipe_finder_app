@@ -22,7 +22,7 @@ class MealListItem extends StatelessWidget {
         );
       },
       child: Hero(
-        tag: meal.id ?? meal.name, // for nice transition
+        tag: meal.id ?? meal.name,
         child: Card(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -33,27 +33,23 @@ class MealListItem extends StatelessWidget {
           child: Stack(
             alignment: Alignment.bottomLeft,
             children: [
-              AspectRatio(
-                aspectRatio: 16 / 9, // Provide a fixed aspect ratio for the image
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 400),
-                  child: Image.network(
-                    meal.imageUrl,
-                    key: ValueKey(meal.imageUrl),
-                    height: double.infinity,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, progress) {
-                      if (progress == null) return child;
-                      return const Center(child: CircularProgressIndicator());
-                    },
-                    errorBuilder: (context, error, stackTrace) => const Center(
-                      child:
-                          Icon(Icons.broken_image, size: 50, color: Colors.grey),
-                    ),
+              // 👇 remove AspectRatio, use Positioned.fill instead
+              Positioned.fill(
+                child: Image.network(
+                  meal.imageUrl,
+                  fit: BoxFit.cover,
+                  loadingBuilder: (context, child, progress) {
+                    if (progress == null) return child;
+                    return const Center(child: CircularProgressIndicator());
+                  },
+                  errorBuilder: (context, error, stackTrace) => const Center(
+                    child:
+                        Icon(Icons.broken_image, size: 50, color: Colors.grey),
                   ),
                 ),
               ),
+
+              // gradient overlay
               Container(
                 height: 80,
                 decoration: BoxDecoration(
@@ -67,6 +63,7 @@ class MealListItem extends StatelessWidget {
                   ),
                 ),
               ),
+
               Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Text(
@@ -87,6 +84,7 @@ class MealListItem extends StatelessWidget {
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
+
               Positioned(
                 right: 10,
                 bottom: 10,
