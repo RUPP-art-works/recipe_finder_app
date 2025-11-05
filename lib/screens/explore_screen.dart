@@ -1,10 +1,8 @@
-// lib/screens/explore_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/meal.dart';
 import '../providers/category_provider.dart';
-import '../api/api_service.dart'; // We need this for fetching filtered meals
+import '../api/api_service.dart';
 import '../widgets/meal_list_item.dart';
 
 class ExploreScreen extends StatefulWidget {
@@ -28,33 +26,31 @@ class _ExploreScreenState extends State<ExploreScreen> {
     });
   }
 
-  // Method to fetch meals based on the selected category
-  Future<void> _fetchMealsForCategory(String? categoryName) async {
-    debugPrint('Fetching meals for category: $categoryName');
-    if (categoryName == null) {
-      setState(() {
-        _filteredMeals = []; // Clear the list if no category is selected
-      });
+  // ✅ Fetch meals based on categoryId
+  Future<void> _fetchMealsForCategoryId(String? categoryId) async {
+    debugPrint('Fetching meals for categoryId: $categoryId');
+
+    if (categoryId == null || categoryId.isEmpty) {
+      setState(() => _filteredMeals = []);
       return;
     }
 
-    setState(() {
-      _isMealsLoading = true;
-    });
+    setState(() => _isMealsLoading = true);
 
     try {
-      final meals = await _apiService.getMealsByCategory(categoryName);
+      final meals = await _apiService.getMealsByCategoryId(categoryId);
       setState(() {
         _filteredMeals = meals;
-        debugPrint('Found ${_filteredMeals.length} meals.');
+        debugPrint(
+            'Found ${_filteredMeals.length} meals for category $categoryId.');
       });
     } catch (e) {
-      debugPrint(e.toString());
-      // Optionally, show a snackbar or error message
+      debugPrint('Error fetching meals: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to load meals.')),
+      );
     } finally {
-      setState(() {
-        _isMealsLoading = false;
-      });
+      setState(() => _isMealsLoading = false);
     }
   }
 
@@ -63,17 +59,23 @@ class _ExploreScreenState extends State<ExploreScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Explore by Category'),
+        centerTitle: true,
       ),
       body: Column(
         children: [
-          // 1. Category Filter Chips
+          // 🔹 Category Filter Chips
           Consumer<CategoryProvider>(
-            builder: (context, categoryProvider, child) {
+            builder: (context, categoryProvider, _) {
               if (categoryProvider.isLoading) {
                 return const Center(child: LinearProgressIndicator());
               }
+
+              if (categoryProvider.categories.isEmpty) {
+                return const Center(child: Text('No categories found.'));
+              }
+
               return SizedBox(
-                height: 50,
+                height: 60,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
@@ -90,12 +92,13 @@ class _ExploreScreenState extends State<ExploreScreen> {
                         selected:
                             categoryProvider.selectedCategory == category.name,
                         onSelected: (isSelected) {
-                          // Update the selected category in the provider
+                          // ✅ Update selected category
                           categoryProvider.selectCategory(category.name);
-                          debugPrint('Selected category from provider: ${categoryProvider.selectedCategory}');
-                          // Fetch meals for the newly selected category
-                          _fetchMealsForCategory(
-                              categoryProvider.selectedCategory);
+                          debugPrint(
+                              'Selected: ${category.name} (id: ${category.id})');
+
+                          // ✅ Fetch by categoryId (the real filter key)
+                          _fetchMealsForCategoryId(category.id);
                         },
                       ),
                     );
@@ -104,8 +107,10 @@ class _ExploreScreenState extends State<ExploreScreen> {
               );
             },
           ),
+
           const Divider(),
-          // 2. Filtered Meal List
+
+          // 🔹 Filtered Meal List
           Expanded(
             child: _isMealsLoading
                 ? const Center(child: CircularProgressIndicator())

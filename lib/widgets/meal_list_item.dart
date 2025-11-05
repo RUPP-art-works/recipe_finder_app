@@ -33,21 +33,24 @@ class MealListItem extends StatelessWidget {
           child: Stack(
             alignment: Alignment.bottomLeft,
             children: [
-              AnimatedSwitcher(
-                duration: const Duration(milliseconds: 400),
-                child: Image.network(
-                  meal.imageUrl,
-                  key: ValueKey(meal.imageUrl),
-                  height: double.infinity,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  loadingBuilder: (context, child, progress) {
-                    if (progress == null) return child;
-                    return const Center(child: CircularProgressIndicator());
-                  },
-                  errorBuilder: (context, error, stackTrace) => const Center(
-                    child:
-                        Icon(Icons.broken_image, size: 50, color: Colors.grey),
+              AspectRatio(
+                aspectRatio: 16 / 9, // Provide a fixed aspect ratio for the image
+                child: AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 400),
+                  child: Image.network(
+                    meal.imageUrl,
+                    key: ValueKey(meal.imageUrl),
+                    height: double.infinity,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, progress) {
+                      if (progress == null) return child;
+                      return const Center(child: CircularProgressIndicator());
+                    },
+                    errorBuilder: (context, error, stackTrace) => const Center(
+                      child:
+                          Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                    ),
                   ),
                 ),
               ),

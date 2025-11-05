@@ -1,37 +1,37 @@
+// lib/api/api_service.dart
 import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart' as foundation; // for debugPrint
 import '../models/meal.dart';
 import '../models/category.dart';
 
 class ApiService {
   final String _baseUrl = 'https://meal-db-sandy.vercel.app';
 
-  // IMPORTANT: Make sure this GUID is exactly the one that works in Postman.
+  // IMPORTANT: Make sure this matches the GUID you tested in Postman
   final Map<String, String> _headers = {
-    'X-DB-NAME':
-        'e5c213ef-7c04-4961-a5da-12a3667228b4' // <-- PASTE YOUR GUID HERE
+    'X-DB-NAME': 'e5c213ef-7c04-4961-a5da-12a3667228b4',
   };
 
+  // 🔹 Fetch all meals
   Future<List<Meal>> getMeals() async {
-    // We are making a request to the /meals endpoint
     final response = await http.get(
       Uri.parse('$_baseUrl/meals'),
       headers: _headers,
     );
 
     if (response.statusCode == 200) {
-      // If the server returns a 200 OK response, parse the JSON.
       List<dynamic> body = jsonDecode(response.body);
       List<Meal> meals =
           body.map((dynamic item) => Meal.fromJson(item)).toList();
       return meals;
     } else {
-      // If the server did not return a 200 OK response, throw an exception.
       throw Exception('Failed to load meals');
     }
   }
 
+  // 🔹 Fetch multiple random meals
   Future<List<Meal>> getMultipleRandomMeals(int count) async {
     final response = await http.get(
       Uri.parse('$_baseUrl/meals'),
@@ -49,6 +49,7 @@ class ApiService {
     }
   }
 
+  // 🔹 Fetch a single random meal
   Future<Meal> getRandomMeal() async {
     final response = await http.get(
       Uri.parse('$_baseUrl/meals'),
@@ -66,15 +67,12 @@ class ApiService {
     }
   }
 
+  // 🔹 Fetch all categories
   Future<List<Category>> getCategories() async {
     final response = await http.get(
       Uri.parse('$_baseUrl/categories'),
       headers: _headers,
     );
-
-    // Optional: You can add debug prints here too if needed
-    // print('DEBUG (getCategories): Response Status Code: ${response.statusCode}');
-    // print('DEBUG (getCategories): Response Body: ${response.body}');
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);
@@ -86,16 +84,20 @@ class ApiService {
     }
   }
 
+  // 🔹 (Old version) Fetch meals by category name
   Future<List<Meal>> getMealsByCategory(String categoryName) async {
-    // The API uses a query parameter to filter, e.g., /meals?strCategory=Seafood
+    final url = Uri.parse('$_baseUrl/meals?strCategory=$categoryName');
+    foundation.debugPrint('DEBUG (getMealsByCategory): Requesting URL: $url');
+
     final response = await http.get(
-      Uri.parse('$_baseUrl/meals?strCategory=$categoryName'),
+      url,
       headers: _headers,
     );
 
-    // Optional: You can add debug prints here too if needed
-    // print('DEBUG (getMealsByCategory): Response Status Code: ${response.statusCode}');
-    // print('DEBUG (getMealsByCategory): Response Body: ${response.body}');
+    foundation.debugPrint(
+        'DEBUG (getMealsByCategory): Response Status Code: ${response.statusCode}');
+    foundation.debugPrint(
+        'DEBUG (getMealsByCategory): Response Body: ${response.body}');
 
     if (response.statusCode == 200) {
       List<dynamic> body = jsonDecode(response.body);
@@ -107,6 +109,32 @@ class ApiService {
     }
   }
 
+  // ✅ NEW: Fetch meals by category ID (this is the one used in ExploreScreen)
+  Future<List<Meal>> getMealsByCategoryId(String categoryId) async {
+    final url = Uri.parse('$_baseUrl/meals?categoryId=$categoryId');
+    foundation.debugPrint('DEBUG (getMealsByCategoryId): Requesting URL: $url');
+
+    final response = await http.get(
+      url,
+      headers: _headers,
+    );
+
+    foundation.debugPrint(
+        'DEBUG (getMealsByCategoryId): Response Status Code: ${response.statusCode}');
+    foundation.debugPrint(
+        'DEBUG (getMealsByCategoryId): Response Body: ${response.body}');
+
+    if (response.statusCode == 200) {
+      List<dynamic> body = jsonDecode(response.body);
+      List<Meal> meals =
+          body.map((dynamic item) => Meal.fromJson(item)).toList();
+      return meals;
+    } else {
+      throw Exception('Failed to load meals for categoryId $categoryId');
+    }
+  }
+
+  // 🔹 Fetch detail for one meal by ID
   Future<Meal> getMealDetail(String id) async {
     final response = await http.get(
       Uri.parse('$_baseUrl/meals/$id'),
@@ -121,4 +149,3 @@ class ApiService {
     }
   }
 }
-
