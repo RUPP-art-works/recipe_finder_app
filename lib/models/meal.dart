@@ -9,6 +9,8 @@ class Meal {
   final String imageUrl;
   final List<String> ingredients;
   final List<String> measures;
+  final String? youtubeUrl;
+  final String? sourceUrl;
 
   Meal({
     required this.id,
@@ -19,6 +21,8 @@ class Meal {
     required this.imageUrl,
     required this.ingredients,
     required this.measures,
+    this.youtubeUrl,
+    this.sourceUrl,
   });
 
   factory Meal.fromJson(Map<String, dynamic> json) {
@@ -44,6 +48,8 @@ class Meal {
       imageUrl: json['mealThumb'] ?? '',
       ingredients: ingredients,
       measures: measures,
+      youtubeUrl: json['youtube'],
+      sourceUrl: json['source'],
     );
   }
 }

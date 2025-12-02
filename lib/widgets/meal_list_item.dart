@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../models/meal.dart';
+import '../providers/meal_provider.dart';
 import '../screens/meal_detail_screen.dart';
 
 class MealListItem extends StatelessWidget {
@@ -88,17 +90,27 @@ class MealListItem extends StatelessWidget {
               Positioned(
                 right: 10,
                 bottom: 10,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  padding: const EdgeInsets.all(6),
-                  child: const Icon(
-                    Icons.favorite_border,
-                    size: 20,
-                    color: Colors.redAccent,
-                  ),
+                child: Consumer<MealProvider>(
+                  builder: (context, mealProvider, child) {
+                    final isFavorite = mealProvider.isFavorite(meal);
+                    return GestureDetector(
+                      onTap: () {
+                        mealProvider.toggleFavorite(meal);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.9),
+                          borderRadius: BorderRadius.circular(50),
+                        ),
+                        padding: const EdgeInsets.all(6),
+                        child: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          size: 20,
+                          color: Colors.redAccent,
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
             ],

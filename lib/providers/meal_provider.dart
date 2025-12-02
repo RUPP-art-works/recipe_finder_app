@@ -49,14 +49,19 @@ class MealProvider with ChangeNotifier {
   }
 
   void toggleFavorite(Meal meal) {
+    debugPrint('Toggling favorite for meal: ${meal.name} (ID: ${meal.id})');
     if (_favoriteMealIds.contains(meal.id)) {
+      debugPrint('Meal is currently a favorite. Removing it.');
       _favoriteMealIds.remove(meal.id);
       _favoriteMeals.removeWhere((favMeal) => favMeal.id == meal.id);
     } else {
+      debugPrint('Meal is not a favorite. Adding it.');
       _favoriteMealIds.add(meal.id);
       _favoriteMeals.add(meal); // Add the meal directly for immediate display
     }
+    debugPrint('Favorite IDs are now: $_favoriteMealIds');
     _saveFavorites();
+    debugPrint('Favorites saved. Notifying listeners.');
     notifyListeners();
   }
 
