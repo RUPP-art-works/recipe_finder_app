@@ -88,8 +88,8 @@ class MealListItem extends StatelessWidget {
               ),
 
               Positioned(
-                right: 10,
-                bottom: 10,
+                top: 8,
+                right: 8,
                 child: Consumer<MealProvider>(
                   builder: (context, mealProvider, child) {
                     final isFavorite = mealProvider.isFavorite(meal);
@@ -99,14 +99,14 @@ class MealListItem extends StatelessWidget {
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.9),
-                          borderRadius: BorderRadius.circular(50),
+                          color: Colors.black.withOpacity(0.5),
+                          shape: BoxShape.circle,
                         ),
-                        padding: const EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(8),
                         child: Icon(
                           isFavorite ? Icons.favorite : Icons.favorite_border,
-                          size: 20,
-                          color: Colors.redAccent,
+                          size: 24,
+                          color: isFavorite ? Colors.redAccent : Colors.white,
                         ),
                       ),
                     );
