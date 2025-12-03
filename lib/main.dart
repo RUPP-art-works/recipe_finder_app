@@ -1,13 +1,16 @@
-// lib/main.dart
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:recipe_finder_app/screens/onboarding_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'providers/meal_provider.dart'; // Import the provider
 import 'screens/main_screen.dart';
 import 'providers/category_provider.dart';
 
-void main() {
-
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final prefs = await SharedPreferences.getInstance();
+  final bool showOnboarding = prefs.getBool('showOnboarding') ?? true;
   runApp(
     // Wrap the entire app in a MultiProvider
     MultiProvider(
@@ -16,13 +19,14 @@ void main() {
         // You can add more providers here later, e.g., for categories or favorites
         ChangeNotifierProvider(create: (_) => CategoryProvider()),
       ],
-      child: const RecipeFinderApp(),
+      child: RecipeFinderApp(showOnboarding: showOnboarding),
     ),
   );
 }
 
 class RecipeFinderApp extends StatelessWidget {
-  const RecipeFinderApp({super.key});
+  final bool showOnboarding;
+  const RecipeFinderApp({super.key, required this.showOnboarding});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +37,7 @@ class RecipeFinderApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       // Set the home property to our new MainScreen
-      home: const MainScreen(),
+      home: showOnboarding ? const OnboardingScreen() : const MainScreen(),
     );
   }
 }
